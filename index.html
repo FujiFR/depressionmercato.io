@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercato Dépression 📉 (Live)</title>
+    <title>Mercato Dépression Pro 📉</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --card-color: #2d2d2d;
-            --text-color: #ffffff;
+            --bg-color: #121212;
+            --card-color: #1e1e1e;
+            --card-sub: #2a2a2a;
+            --text-color: #e0e0e0;
             --accent-color: #ff4757;
             --green: #2ed573;
+            --blue: #54a0ff;
+            --grey: #a4b0be;
         }
 
         body {
@@ -24,387 +28,306 @@
             align-items: center;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            color: var(--accent-color);
-            margin-bottom: 5px;
-        }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--accent-color); margin-bottom: 5px; }
 
         .live-indicator {
             display: inline-block;
-            background: rgba(46, 213, 115, 0.2);
+            background: rgba(46, 213, 115, 0.15);
             color: var(--green);
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.8em;
             font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .live-dot {
-            height: 8px;
-            width: 8px;
-            background-color: var(--green);
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-            animate: blink 1s infinite;
         }
 
         .container {
-            display: flex;
-            gap: 30px;
-            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            max-width: 1300px;
             width: 100%;
-            flex-wrap: wrap;
         }
+
+        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
 
         .section {
-            flex: 1;
-            min-width: 300px;
             background: var(--card-color);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        h2 {
-            border-bottom: 2px solid #444;
-            padding-bottom: 10px;
-            margin-top: 0;
-        }
+        .full-width { grid-column: 1 / -1; }
+        h2 { border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 0; color: #fff;}
+        h3 { color: var(--blue); margin-top: 0;}
 
-        .market-list {
-            list-style: none;
-            padding: 0;
-        }
-
+        /* Classement */
+        .market-list { list-style: none; padding: 0; margin: 0; }
         .market-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: #3a3a3a;
-            margin-bottom: 10px;
+            padding: 14px;
+            background: var(--card-sub);
+            margin-bottom: 12px;
             border-radius: 8px;
             border-left: 5px solid transparent;
         }
-
-        .market-item.top-1 { border-left-color: #ff4757; }
+        .market-item.top-1 { border-left-color: var(--accent-color); }
         .market-item.top-2 { border-left-color: #ffa502; }
         .market-item.top-3 { border-left-color: #eccc68; }
 
-        .colleague-info {
-            display: flex;
-            flex-direction: column;
-        }
+        .name { font-weight: bold; font-size: 1.1em; }
+        .status { font-size: 0.85em; color: #aaa; font-style: italic; display: block; margin-top: 2px;}
+        .rank-badge { background: #444; padding: 2px 7px; border-radius: 10px; font-size: 0.8em; margin-right: 8px;}
 
-        .name {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .status {
-            font-size: 0.85em;
-            color: #bbb;
-            font-style: italic;
-        }
-
-        .rank-badge {
-            background: #555;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-right: 8px;
-        }
-
-        .colleague-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
+        .colleague-actions { display: flex; align-items: center; gap: 12px; }
         .odds {
-            font-size: 1.3em;
+            font-size: 1.2em;
             font-weight: bold;
             color: var(--accent-color);
             background: rgba(255, 71, 87, 0.1);
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
         }
 
-        .vote-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.3em;
-            transition: transform 0.1s;
-        }
-
+        .vote-btn { background: none; border: none; cursor: pointer; font-size: 1.4em; transition: transform 0.1s;}
         .vote-btn:hover { transform: scale(1.2); }
-        .vote-btn:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(100%); }
+        .vote-btn:disabled { opacity: 0.15; cursor: not-allowed; filter: grayscale(100%); }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        label { font-weight: bold; font-size: 0.9em; color: #ccc;}
-
-        input, select {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #555;
-            background: #444;
-            color: white;
-            font-size: 1em;
-        }
-
-        button.submit-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
+        .rip-btn {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid #ff4757;
+            padding: 5px 8px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.8em;
+            font-weight: bold;
             transition: background 0.2s;
         }
+        .rip-btn:hover { background: #ff4757; color: white; }
 
-        button.submit-btn:hover { background: #ff6b81; }
-
-        .info-note {
-            font-size: 0.8em;
-            color: #888;
-            margin-top: 15px;
-            text-align: center;
+        /* Formulaires & Inputs */
+        form { display: flex; flex-direction: column; gap: 12px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; margin-bottom: 15px;}
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        label { font-weight: bold; font-size: 0.85em; color: #bbb; }
+        input, select { padding: 10px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: white; font-size: 0.95em; }
+        
+        button.submit-btn {
+            background: var(--blue); color: white; border: none; padding: 12px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1em; transition: background 0.2s;
         }
+        button.submit-btn:hover { filter: brightness(1.1); }
+        button.accent-btn { background: var(--accent-color); }
 
-        #loading {
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-            color: #888;
-        }
+        /* Tableaux */
+        .custom-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: var(--card-sub); border-radius: 8px; overflow: hidden;}
+        .custom-table th, .custom-table td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        .custom-table th { background: #222; color: var(--blue); }
+        .custom-table.rip-table th { color: var(--accent-color); }
+        .token-badge { background: #eccc68; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;}
+        .rip-badge { background: #57606f; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;}
+
+        #loading { text-align: center; padding: 20px; color: #888; font-style: italic; }
+        .chart-container { position: relative; height: 320px; width: 100%; margin-top: 15px;}
     </style>
 </head>
 <body>
 
     <header>
-        <h1>📉 Mercato Dépression</h1>
-        <div class="live-indicator"><span class="live-dot"></span>Synchronisé en temps réel</div>
+        <h1>📉 Mercato Dépression Pro</h1>
+        <div class="live-indicator">● Mode Live Synchronisé</div>
     </header>
 
     <div class="container">
+        
         <div class="section">
             <h2>Le Classement Général</h2>
-            <div id="loading">Connexion au serveur du seum...</div>
+            <div id="loading">Récupération des données du seum...</div>
             <ul id="marketList" class="market-list"></ul>
         </div>
 
         <div class="section">
-            <h2>Alimenter le Mercato</h2>
+            <h2>Alimenter la Base</h2>
             
             <form id="moodForm">
-                <h3>Formulaire d'Humeur (Côte++)</h3>
+                <h3>Changement d'Humeur / Côte</h3>
                 <div class="form-group">
-                    <label for="colleagueSelect">Qui es-tu ? (Ou qui cibles-tu ?)</label>
-                    <select id="colleagueSelect" required>
-                        <option value="">-- Chargement des cibles --</option>
+                    <label>Collaborateur ciblé :</label>
+                    <select class="colleagueSelect" required>
+                        <option value="">-- Sélectionner --</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="moodSelect">Niveau de seum actuel :</label>
+                    <label>Nouveau constat d'ambiance :</label>
                     <select id="moodSelect" required>
-                        <option value="1">😀 Tout va bien (Côte baisse)</option>
-                        <option value="2">😐 Routine / Bof (Stable)</option>
-                        <option value="3">😮‍💨 Fatigué / Soupirs réguliers (Côte monte)</option>
-                        <option value="4">😭 À deux doigts de pleurer aux toilettes (Côte s'envole)</option>
-                        <option value="5">🔥 CV mis à jour, en entretien pendant la pause déj (Alerte Départ)</option>
+                        <option value="1">😀 Tout va bien (Le moral remonte / Côte baisse)</option>
+                        <option value="2">😐 Routine RAS (Stable)</option>
+                        <option value="3">😮‍💨 Soupirs répétés / Fatigue (Moral- / Côte monte)</option>
+                        <option value="4">😭 Au bout du rouleau / Larme à l'œil (Moral-- / Côte s'envole)</option>
+                        <option value="5">🔥 CV actualisé ouvert en Open Space (Alerte Rouge !)</option>
                     </select>
                 </div>
-                <button type="submit" class="submit-btn">Mettre à jour l'humeur</button>
+                <button type="submit" class="submit-btn accent-btn">Enregistrer l'humeur</button>
             </form>
 
-            <hr style="border: 1px solid #444; margin: 25px 0;">
-
             <form id="addColleagueForm">
-                <h3>Ajouter une nouvelle cible au Mercato</h3>
+                <h3>Inscrire un nouveau collègue</h3>
                 <div class="form-group">
                     <input type="text" id="newColleagueName" placeholder="Prénom Nom" required>
                 </div>
-                <button type="submit" class="submit-btn" style="background-color: #555;">Inscrire au Mercato</button>
+                <button type="submit" class="submit-btn" style="background:#444;">Ajouter au Mercato</button>
             </form>
-
-            <p class="info-note">⚠️ Les votes par pouce restent limités à 1 vote par personne et par jour sur votre navigateur.</p>
         </div>
+
+        <div class="section full-width">
+            <h2>Suivi de la Côte (Historique Graphique Journalier)</h2>
+            <div class="chart-container">
+                <canvas id="oddsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="section full-width">
+            <h2>Bookmaker : Paris Long Terme 🎰</h2>
+            <p style="color: #aaa; font-size: 0.9em; margin-top: -10px;">Misez vos faux tickets resto sur le prochain départ.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; flex-wrap: wrap;">
+                <form id="betForm" style="margin: 0;">
+                    <h3>Placer un prono</h3>
+                    <div class="form-group">
+                        <label>Votre nom (Parieur) :</label>
+                        <input type="text" id="bettorName" placeholder="Votre Prénom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Qui va partir ?</label>
+                        <select class="colleagueSelect" id="betTargetSelect" required>
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Mois du départ :</label>
+                            <select id="betMonth" required>
+                                <option value="Janvier">Janvier</option><option value="Février">Février</option>
+                                <option value="Mars">Mars</option><option value="Avril">Avril</option>
+                                <option value="Mai">Mai</option><option value="Juin">Juin</option>
+                                <option value="Juillet">Juillet</option><option value="Août">Août</option>
+                                <option value="Septembre">Septembre</option><option value="Octobre">Octobre</option>
+                                <option value="Novembre">Novembre</option><option value="Décembre">Décembre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Année :</label>
+                            <select id="betYear" required>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mise (Tickets Resto 🎫) :</label>
+                        <input type="number" id="betAmount" min="1" max="10" value="1" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Valider le Pari</button>
+                </form>
+
+                <div style="overflow-x: auto;">
+                    <h3>Pronostics en cours</h3>
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Parieur</th>
+                                <th>Cible</th>
+                                <th>Date Pronostiquée</th>
+                                <th>Mise</th>
+                            </tr>
+                        </thead>
+                        <tbody id="betsTableBody">
+                            <tr><td colspan="4" style="text-align:center; color:#666;">Aucun pari enregistré.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="section full-width" style="border: 1px dashed var(--accent-color);">
+            <h2 style="color: var(--accent-color);">🪦 Tombés au Combat (Hall of Fame / RIP)</h2>
+            <p style="color: #aaa; font-size: 0.9em; margin-top: -10px;">Hommage à ceux qui ont réussi à s'échapper de l'open space.</p>
+            
+            <div style="overflow-x: auto;">
+                <table class="custom-table rip-table">
+                    <thead>
+                        <tr>
+                            <th>Ancien Collègue</th>
+                            <th>Dernier Statut mémorable</th>
+                            <th>Date de Libération</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ripTableBody">
+                        <tr><td colspan="3" style="text-align:center; color:#666;">Personne n'est encore tombé au combat. L'esclavage continue !</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "<a href="https://urldefense.proofpoint.com/v2/url?u=https-3A__www.gstatic.com_firebasejs_10.8.0_firebase-2Dapp.js&amp;d=DwQGaQ&amp;c=_iCNGiNEs_O_Rm9zsd7PzQ&amp;r=TdYahNU5mcRnFkc-Ry2I2K-GZbS8DJulku4taMYKcZWJTlyIG6mUiZ2dUgW_zT2S&amp;m=hp5DllNOouR1daDlGTuZrNWDMXUghUCmMFbRidG0jHvijLeo-sqk4tKAxg_4hP12&amp;s=m3U0_5iPzh3yiB9MKlVMdy4CQTESGJ-9whvnYwgPpP0&amp;e=">https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js</a>";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc } from "<a href="https://urldefense.proofpoint.com/v2/url?u=https-3A__www.gstatic.com_firebasejs_10.8.0_firebase-2Dfirestore.js&amp;d=DwQGaQ&amp;c=_iCNGiNEs_O_Rm9zsd7PzQ&amp;r=TdYahNU5mcRnFkc-Ry2I2K-GZbS8DJulku4taMYKcZWJTlyIG6mUiZ2dUgW_zT2S&amp;m=hp5DllNOouR1daDlGTuZrNWDMXUghUCmMFbRidG0jHvijLeo-sqk4tKAxg_4hP12&amp;s=4vTseu4K4fFU1bKSqhaHLPZ93wQ35fGF2WDhpqQE2Nk&amp;e=">https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js</a>";
 
-        // Configuration d'une base temporaire de démo partagée
+        // ⚠️ REMPLACE CE BLOC PAR TES PROPRES CLÉS DE LA CONSOLE FIREBASE !
         const firebaseConfig = {
-        apiKey: "AIzaSyCn70t0lsSEoucFQDjvziA-KNO4u4jF_H4",
-        authDomain: "mercatodepression.firebaseapp.com",
-        projectId: "mercatodepression",
-        storageBucket: "mercatodepression.firebasestorage.app",
-        messagingSenderId: "409377389288",
-        appId: "1:409377389288:web:55e333c9be54796d5fe75d",
+            apiKey: "AIzaSyAs76XW8W_XmG9mN-88mMDX7m1sW8XM_ws",
+            authDomain: "mercato-depression-demo.firebaseapp.com",
+            projectId: "mercato-depression-demo",
+            storageBucket: "mercato-depression-demo.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:1234567890"
         };
 
-        // Initialisation de Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
         const colleaguesRef = collection(db, "colleagues");
+        const betsRef = collection(db, "bets");
 
         let colleagues = [];
+        let bets = [];
+        let oddsChartInstance = null;
 
         function calculateOdds(score) {
-            if (score <= 0) return "99.0";
+            if (score &lt;= 0) return 99.0;
             let odds = (100 / score) + 1;
-            return odds.toFixed(2);
+            return parseFloat(odds.toFixed(2));
         }
 
-        // 🔄 ÉCOUTE EN TEMPS RÉEL : Dès que la base change, TOUS les écrans se mettent à jour
-        onSnapshot(colleaguesRef, (snapshot) => {
-            colleagues = [];
-            snapshot.forEach((doc) => {
-                colleagues.push({ id: doc.id, ...doc.data() });
-            });
-            
-            document.getElementById('loading').style.display = 'none';
-            renderDashboard();
-        });
-
-        function renderDashboard() {
-            const listElement = document.getElementById('marketList');
-            const selectElement = document.getElementById('colleagueSelect');
-            
-            // Trier par score décroissant
-            colleagues.sort((a, b) => b.score - a.score);
-
-            listElement.innerHTML = '';
-            if(colleagues.length === 0) {
-                listElement.innerHTML = "<li style='text-align:center;color:#888;padding:20px;'>Aucun collègue inscrit. Soyez le premier !</li>";
-            }
-
-            colleagues.forEach((c, index) => {
-                const isTop = index < 3 ? `top-${index + 1}` : '';
-                const today = new Date().toDateString();
-                const hasVoted = localStorage.getItem(`voted_${c.id}_${today}`) === 'true';
-
-                const li = document.createElement('li');
-                li.className = `market-item ${isTop}`;
-                li.innerHTML = `
-                    <div class="colleague-info">
-                        <div><span class="rank-badge">#${index + 1}</span><span class="name">${c.name}</span></div>
-                        <span class="status">${c.status || 'Pas de vagues...'}</span>
-                    </div>
-                    <div class="colleague-actions">
-                        <span class="odds">Côte: ${calculateOdds(c.score)}</span>
-                        <button class="vote-btn" data-id="${c.id}" data-vote="up" ${hasVoted ? 'disabled' : ''}>👍</button>
-                        <button class="vote-btn" data-id="${c.id}" data-vote="down" ${hasVoted ? 'disabled' : ''}>👎</button>
-                    </div>
-                `;
-                listElement.appendChild(li);
-            });
-
-            // Gérer les clics sur les boutons de vote
-            document.querySelectorAll('.vote-btn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = btn.getAttribute('data-id');
-                    const type = btn.getAttribute('data-vote');
-                    const today = new Date().toDateString();
-
-                    if (localStorage.getItem(`voted_${id}_${today}`) === 'true') return;
-
-                    const colleague = colleagues.find(c => c.id === id);
-                    if (colleague) {
-                        const value = type === 'up' ? 5 : -5;
-                        const newScore = Math.max(0, colleague.score + value);
-                        const newStatus = type === 'up' ? "Le moral baisse suite aux rumeurs..." : "Repris en main par le management, stable.";
-                        
-                        localStorage.setItem(`voted_${id}_${today}`, 'true');
-                        
-                        // Envoi à la base de données
-                        await updateDoc(doc(db, "colleagues", id), {
-                            score: newScore,
-                            status: newStatus
-                        });
-                    }
-                });
-            });
-
-            // Mettre à jour le sélecteur du formulaire d'humeur
-            const currentSelectValue = selectElement.value;
-            selectElement.innerHTML = '<option value="">-- Choisir un collaborateur --</option>';
-            colleagues.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.name;
-                selectElement.appendChild(opt);
-            });
-            selectElement.value = currentSelectValue;
+        // Fonction utilitaire pour obtenir la date du jour (ex: "11/06")
+        function getTodayLabel() {
+            const d = new Date();
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
         }
 
-        // Action : Soumettre une humeur
-        document.getElementById('moodForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('colleagueSelect').value;
-            const moodValue = parseInt(document.getElementById('moodSelect').value);
+        // Met à jour l'historique de manière journalière (écrase ou crée le point du jour unique)
+        function updateDailyHistory(currentHistory, currentOdds) {
+            let history = currentHistory ? [...currentHistory] : [];
+            const todayLabel = getTodayLabel();
             
-            const colleague = colleagues.find(c => c.id === id);
-            if (colleague) {
-                let scoreImpact = 0;
-                let newStatus = "";
-                
-                switch(moodValue) {
-                    case 1: scoreImpact = -15; newStatus = "Sourire suspect en open space"; break;
-                    case 2: scoreImpact = 0; newStatus = "Fait le dos rond"; break;
-                    case 3: scoreImpact = 10; newStatus = "Soupire bruyamment devant Excel"; break;
-                    case 4: scoreImpact = 25; newStatus = "A passé 45min aux toilettes ce matin"; break;
-                    case 5: scoreImpact = 50; newStatus = "Carton suspect sous le bureau"; break;
-                }
-
-                const newScore = Math.max(0, colleague.score + scoreImpact);
-                
-                await updateDoc(doc(db, "colleagues", id), {
-                    score: newScore,
-                    status: newStatus
-                });
-
-                document.getElementById('moodForm').reset();
+            const existingDayIdx = history.findIndex(h =&gt; h.date === todayLabel);
+            
+            if (existingDayIdx !== -1) {
+                history[existingDayIdx].odds = currentOdds;
+            } else {
+                history.push({ date: todayLabel, odds: currentOdds });
             }
-        });
+            
+            if (history.length &gt; 15) history.shift(); // Limite à 15 jours d'historique glissant
+            return history;
+        }
 
-        // Action : Ajouter un collègue
-        document.getElementById('addColleagueForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('newColleagueName').value.trim();
-            if (name) {
-                // Ajout direct dans Firebase
-                await addDoc(colleaguesRef, {
-                    name: name,
-                    score: 40,
-                    status: "Nouvelle recrue sur le marché"
-                });
-                document.getElementById('addColleagueForm').reset();
-            }
-        });
-    </script>
-</body>
-</html>
+        // 🔄 ÉCOUTE TEMPS RÉEL SUR FIREBASE
+        onSnapshot(colleaguesRef, (snapshot) =&gt; {
+            colle
