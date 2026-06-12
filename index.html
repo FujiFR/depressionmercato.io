@@ -436,10 +436,9 @@
 
     </div>
 
-    <!-- Firebase JS Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // ⚠️ REMPLACE CE BLOC PAR TES PROPRES CLÉS DE LA CONSOLE FIREBASE !
         const firebaseConfig = {
