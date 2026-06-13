@@ -259,11 +259,10 @@
                 </div>
             </form>
 
-            <!-- Cadre Michael Scott avec citation dynamique -->
-            <div class="office-gif-box">
-                <img src="https://media.giphy.com/media/d20PG6M6SAFq7196/giphy.gif" alt="Michael Scott">
-                <div class="quote" id="scottQuoteBox">"Loading wisdom..."</div>
-            </div>
+                    <!-- Cadre Michael Scott avec citation dynamique -->
+        <div class="office-gif-box">
+            <img src="https://media.giphy.com/media/explore/michael-scott/giphy.gif" alt="Michael Scott Random GIF">
+            <div class="quote" id="scottQuoteBox">"Loading wisdom..."</div>
         </div>
 
         <!-- LE PARI DU BUREAU -->
@@ -342,7 +341,7 @@
 
         <!-- CIMETIÈRE -->
         <div class="section full-width" style="background: #111; border-color: #444;">
-            <h2>🪦 Cimetière des RTT / Les évadés de l'open space</h2>
+            <h2>🪦 RIP Les évadés de l'open space</h2>
             <div class="fame-grid" id="fameGridBox"></div>
         </div>
 
@@ -354,12 +353,12 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "VOTRE_API_KEY",
-            authDomain: "VOTRE_AUTH_DOMAIN",
-            projectId: "VOTRE_PROJECT_ID",
-            storageBucket: "VOTRE_STORAGE_BUCKET",
-            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
-            appId: "VOTRE_APP_ID"
+        apiKey: "AIzaSyCn70t0lsSEoucFQDjvziA-KNO4u4jF_H4",
+        authDomain: "mercatodepression.firebaseapp.com",
+        projectId: "mercatodepression",
+        storageBucket: "mercatodepression.firebasestorage.app",
+        messagingSenderId: "409377389288",
+        appId: "1:409377389288:web:55e333c9be54796d5fe75d",
         };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -377,10 +376,32 @@
             "« Il faut que tu saches que je n'ai pas de haine en moi. Je veux juste briser ton visage. »"
         ];
 
-        function rotateQuote() {
+              function rotateQuote() {
+            // 1. Changement de la citation
             document.getElementById('scottQuoteBox').innerText = michaelScottQuotes[Math.floor(Math.random() * michaelScottQuotes.length)];
+            
+            // 2. Sélection d'un ID de GIF de Michael Scott valide parmi les meilleurs de ta page Giphy
+            const scottGifs = [
+                "d20PG6M6SAFq7196", // Le hochement de tête dépité
+                "jOpLpLJYrAzVK",     // Le "No God Please No"
+                "GoZe9Cr4XIsL",     // Le sourire crispé face caméra
+                "fcK3kqK18uSgE",     // Le "Thank You!"
+                "byR44l5TyS2yc",     // Le regard d'incompréhension intense
+                "12NAYvxH968C2I",    // Michael qui pointe du doigt en mode "Parkour"
+                "zmsDqpDL8c7Sg",     // La danse de la victoire ultra gênante
+                "v0eHX3YAzG9Sg",     // Le regard par la fenêtre sous la pluie
+                "XreQmk7ETCNDy"      // "I declare bankruptcy!"
+            ];
+            
+            const randomGifId = scottGifs[Math.floor(Math.random() * scottGifs.length)];
+            const officeImg = document.querySelector('.office-gif-box img');
+            
+            if (officeImg) {
+                // Utilisation du CDN stable de Giphy pour un affichage garanti
+                officeImg.src = `https://media.giphy.com/media/${randomGifId}/giphy.gif`;
+            }
         }
-
+        
         function calculateOdds(score) {
             if (score <= 0) return 99.0;
             return parseFloat(((100 / score) + 1).toFixed(2));
