@@ -2,373 +2,366 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercato Dépression Pro 📉</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mercato Dépression Pro v13.1 📉</title>
+    
+    <!-- Balises PWA Mobile -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mercato Pro">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/235/235252.png">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
-            --bg-color: #121212;
-            --card-color: #1e1e1e;
-            --card-sub: #2a2a2a;
-            --text-color: #e0e0e0;
-            --accent-color: #ff4757;
-            --green: #2ed573;
-            --blue: #54a0ff;
-            --grey: #a4b0be;
-            --yellow: #eccc68;
+            --bg-gradient: linear-gradient(135deg, #0f0f14 0%, #1a1a24 100%);
+            --card-bg: rgba(30, 30, 45, 0.85);
+            --card-sub: rgba(42, 42, 64, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f1f2f6;
+            --text-muted: #a4b0be;
+            --office-red: #ff4757;
+            --office-orange: #ffa502;
+            --office-yellow: #eccc68;
+            --office-blue: #2e86de;
+            --office-green: #2ed573;
+            --office-purple: #9b59b6;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
+            padding-top: calc(15px + env(safe-area-inset-top));
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        header { text-align: center; margin-bottom: 30px; }
-        h1 { color: var(--accent-color); margin-bottom: 5px; }
-
-        .live-indicator {
-            display: inline-block;
-            background: rgba(46, 213, 115, 0.15);
-            color: var(--green);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            max-width: 1300px;
+        header {
+            text-align: center;
+            margin-bottom: 25px;
             width: 100%;
         }
 
-        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+        header h1 {
+            font-size: 1.8em;
+            margin: 0 0 5px 0;
+            background: linear-gradient(45deg, var(--office-red), var(--office-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
 
         .section {
-            background: var(--card-color);
-            padding: 22px;
-            border-radius: 14px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
         }
 
-        .full-width { grid-column: 1 / -1; }
-        h2 { border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 0; color: #fff;}
-        h3 { color: var(--blue); margin-top: 0;}
-
-        /* Classement */
-        .market-list { list-style: none; padding: 0; margin: 0; }
-        .market-item {
+        h2 {
+            font-size: 1.15em;
+            margin-top: 0;
+            margin-bottom: 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 14px;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h3 { color: var(--office-blue); margin-top: 0; font-size: 1em; }
+        #loadingOverlay { text-align: center; padding: 20px; }
+
+        .market-list { list-style: none; padding: 0; margin: 0; }
+        
+        .market-item {
             background: var(--card-sub);
             margin-bottom: 12px;
-            border-radius: 8px;
-            border-left: 5px solid transparent;
+            border-radius: 12px;
+            border-left: 5px solid #444;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .market-item.top-1 { border-left-color: var(--accent-color); }
-        .market-item.top-2 { border-left-color: #ffa502; }
-        .market-item.top-3 { border-left-color: var(--yellow); }
 
-        .name { font-weight: bold; font-size: 1.1em; }
-        .status { font-size: 0.85em; color: #aaa; font-style: italic; display: block; margin-top: 2px;}
-        .rank-badge { background: #444; padding: 2px 7px; border-radius: 10px; font-size: 0.8em; margin-right: 8px;}
+        .market-item.top-1 { border-left-color: var(--office-red); }
+        .market-item.top-2 { border-left-color: var(--office-orange); }
+        .market-item.top-3 { border-left-color: var(--office-yellow); }
 
-        .colleague-actions { display: flex; align-items: center; gap: 12px; }
-        .odds {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--accent-color);
-            background: rgba(255, 71, 87, 0.1);
-            padding: 6px 12px;
+        .item-header { display: flex; align-items: flex-start; justify-content: space-between; }
+        .name { font-weight: 700; font-size: 1.1em; color: #fff; }
+        
+        /* Style des statuts dynamiques mis en valeur */
+        .status { 
+            font-size: 0.85em; 
+            color: #ffdda1; 
+            margin-top: 5px; 
+            font-style: italic;
+            line-height: 1.3;
+        }
+        
+        .mood-reason-tag {
+            display: inline-block;
+            background: rgba(46, 134, 222, 0.15);
+            color: #54a0ff;
+            font-size: 0.75em;
+            padding: 2px 8px;
             border-radius: 6px;
+            margin-top: 6px;
         }
 
-        .vote-btn { background: none; border: none; cursor: pointer; font-size: 1.4em; transition: transform 0.1s;}
-        .vote-btn:hover { transform: scale(1.2); }
-        .vote-btn:disabled { opacity: 0.15; cursor: not-allowed; filter: grayscale(100%); }
+        .colleague-actions {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr auto;
+            gap: 8px;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 8px;
+        }
+
+        .odds {
+            font-size: 1em;
+            font-weight: 800;
+            padding: 8px 10px;
+            background: linear-gradient(135deg, #ff4757 0%, #9b59b6 100%);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .vote-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
 
         .rip-btn {
-            background: rgba(255, 71, 87, 0.2);
+            background: rgba(255, 71, 87, 0.12);
             color: #ff4757;
-            border: 1px solid #ff4757;
-            padding: 5px 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8em;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            padding: 10px;
+            border-radius: 8px;
             font-weight: bold;
-            transition: background 0.2s;
+            font-size: 0.8em;
         }
-        .rip-btn:hover { background: #ff4757; color: white; }
 
-        /* Formulaires & Inputs */
-        form { display: flex; flex-direction: column; gap: 12px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; margin-bottom: 15px;}
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .wailing-wall {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(15, 15, 20, 0.9);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .wailing-post {
+            background: var(--card-sub);
+            border-left: 3px solid var(--office-purple);
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        .wailing-meta { font-size: 0.7em; color: var(--office-purple); margin-top: 4px; }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,0.01);
+            padding: 12px;
+            border-radius: 10px;
+        }
         .form-group { display: flex; flex-direction: column; gap: 4px; }
-        label { font-weight: bold; font-size: 0.85em; color: #bbb; }
-        input, select, textarea { padding: 10px; border-radius: 6px; border: 1px solid #444; background: #2c2c2c; color: white; font-size: 0.95em; font-family: inherit;}
-        
-        button.submit-btn {
-            background: var(--blue); color: white; border: none; padding: 12px;
-            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1em; transition: background 0.2s;
+        label { font-weight: bold; font-size: 0.75em; color: var(--text-muted); }
+        input, select, textarea {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #222232;
+            color: white;
+            font-size: 0.9em;
         }
-        button.submit-btn:hover { filter: brightness(1.1); }
-        button.accent-btn { background: var(--accent-color); }
 
-        /* Tableaux */
-        .custom-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: var(--card-sub); border-radius: 8px; overflow: hidden;}
-        .custom-table th, .custom-table td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
-        .custom-table th { background: #222; color: var(--blue); }
-        .custom-table.rip-table th { color: var(--accent-color); }
+        button.submit-btn {
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            color: white;
+            background: var(--office-blue);
+        }
+        button.accent-btn { background: var(--office-red); }
+
+        .arbitrage-list { display: flex; flex-direction: column; gap: 10px; }
+        .arbitrage-card {
+            background: var(--card-sub);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .arbitrage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         
-        /* Badges & Cartons */
-        .token-badge { background: var(--yellow); color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;}
-        .rip-badge { background: #57606f; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;}
+        .card-badge { padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 0.75em; }
+        .card-yellow { background: var(--office-yellow); color: #000; }
+        .card-red { background: var(--office-red); color: #fff; }
         
-        .card-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85em; text-align: center;}
-        .card-yellow { background: #ffd32a; color: #000; }
-        .card-red { background: #ff3f34; color: #fff; }
+        .var-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .action-sm { padding: 10px; font-size: 0.85em; border-radius: 6px; border: none; font-weight: bold; }
+        .btn-success { background: var(--office-green); color: #000; }
+        .btn-danger { background: var(--office-red); color: #fff; }
 
-        .action-sm { padding: 4px 8px; font-size: 0.8em; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; margin-right: 5px;}
-        .action-sm:disabled { opacity: 0.2; cursor: not-allowed; }
-        .btn-success { background: var(--green); color: black; }
-        .btn-danger { background: var(--accent-color); color: white; }
-        .btn-warning { background: var(--yellow); color: black; }
+        .chart-container { position: relative; height: 220px; width: 100%; }
 
-        #loading { text-align: center; padding: 20px; color: #888; font-style: italic; }
-        .chart-container { position: relative; height: 320px; width: 100%; margin-top: 15px;}
+        .fame-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tombstone {
+            background: #1c1c22;
+            border: 1px solid #555;
+            border-radius: 10px 10px 0 0;
+            padding: 12px;
+            text-align: center;
+        }
+        .tombstone .rip-name { font-weight: bold; font-size: 1em; color: #fff; }
+        .tombstone .rip-reason { font-style: italic; font-size: 0.75em; color: var(--office-red); margin-top: 4px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>📉 Mercato Dépression Pro</h1>
-        <div class="live-indicator">● Mode Live Synchronisé</div>
+        <h1>📉 Mercato Dépression</h1>
+        <div class="subtitle">Saison 2026 — Pocket Edition V13.1 📱</div>
     </header>
 
     <div class="container">
         
+        <!-- CLASSEMENT -->
         <div class="section">
-            <h2>Le Classement Général</h2>
-            <div id="loading">Récupération des données du seum...</div>
-            <ul id="marketList" class="market-list"></ul>
+            <h2>🏆 Argus de l'Épuisement</h2>
+            <div id="loadingOverlay">⏳ Synchronisation...</div>
+            <ul id="marketList" class="market-list" style="display:none;"></ul>
         </div>
 
-        <div class="section">
-            <h2>Alimenter la Base</h2>
+        <!-- MUR DES LAMENTATIONS -->
+        <div class="section" style="border-color: var(--office-purple);">
+            <h2 style="color: var(--office-purple);">🏛️ Le Mur des Lamentations</h2>
+            <div class="wailing-wall" id="wailingWallBox"></div>
+            <form id="wailingForm">
+                <select class="colleagueSelect" id="wailerSelect" required><option value="">Qui êtes-vous ?</option></select>
+                <input type="text" id="wailText" placeholder="Exprimez votre seum..." required>
+                <button type="submit" class="submit-btn" style="background: var(--office-purple);">Crier 🗣️</button>
+            </form>
+        </div>
+
+        <!-- COMMISSION DE DISCIPLINE -->
+        <div class="section" style="border-color: var(--office-orange);">
+            <h2 style="color: var(--office-orange);">🟥 🟨 Arbitrage VAR</h2>
+            <form id="cardForm" style="margin-bottom: 15px;">
+                <select class="colleagueSelect" id="cardTargetSelect" required><option value="">-- Sélectionner la cible --</option></select>
+                <select id="cardType" required><option value="JAUNE">🟨 Carton Jaune</option><option value="ROUGE">🟥 Carton Rouge</option></select>
+                <input type="text" id="cardReason" placeholder="Motif du carton..." required>
+                <input type="text" id="cardPenalty" placeholder="Gage requis..." required>
+                <button type="submit" class="submit-btn" style="background: var(--office-orange); color:black;">Dégainer</button>
+            </form>
             
+            <div class="arbitrage-list" id="cardsMobileContainer"></div>
+        </div>
+
+        <!-- CONSOLE MANAGEMENT -->
+        <div class="section">
+            <h2>⚙️ Console Manager</h2>
             <form id="moodForm">
-                <h3>Changement d'Humeur / Côte</h3>
                 <div class="form-group">
-                    <label>Collaborateur ciblé :</label>
-                    <select class="colleagueSelect" required>
-                        <option value="">-- Sélectionner --</option>
-                    </select>
+                    <select class="colleagueSelect" id="moodColleagueSelect" required><option value="">-- Collaborateur --</option></select>
                 </div>
                 <div class="form-group">
-                    <label>Nouveau constat d'ambiance :</label>
                     <select id="moodSelect" required>
-                        <option value="1">😀 Tout va bien (Le moral remonte / Côte baisse)</option>
-                        <option value="2">😐 Routine RAS (Stable)</option>
-                        <option value="3">😮‍💨 Soupirs répétés / Fatigue (Moral- / Côte monte)</option>
-                        <option value="4">😭 Au bout du rouleau / Larme à l'œil (Moral-- / Côte s'envole)</option>
-                        <option value="5">🔥 CV actualisé ouvert en Open Space (Alerte Rouge !)</option>
+                        <option value="1">😀 Tout va bien (Côte Haute / Moral OK)</option>
+                        <option value="2">😐 Stable</option>
+                        <option value="3">😮‍💨 Soupirs (Côte baisse / Risque)</option>
+                        <option value="4">😭 Crise Imprimante (Côte faible / Alerte)</option>
+                        <option value="5">🔥 Alerte Recrutement (MERCATO CRITIQUE)</option>
                     </select>
                 </div>
-                <button type="submit" class="submit-btn accent-btn">Enregistrer l'humeur</button>
-            </form>
-
-            <form id="addColleagueForm">
-                <h3>Inscrire un nouveau collègue</h3>
                 <div class="form-group">
-                    <input type="text" id="newColleagueName" placeholder="Prénom Nom" required>
+                    <select id="moodReasonSelect">
+                        <option value="">-- Motif Pro --</option>
+                        <option value="Attaque de catoche 🙀">Attaque de catoche 🙀</option>
+                        <option value="Réunion inutile de 2h ⏰">Réunion inutile de 2h ⏰</option>
+                        <option value="J'ai trop faim 🥖">J'ai trop faim 🥖</option>
+                        <option value="Vie de merde 😩">Vie de merde 😩</option>
+                    </select>
                 </div>
-                <button type="submit" class="submit-btn" style="background:#444;">Ajouter au Mercato</button>
+                <button type="submit" class="submit-btn accent-btn">Inscrire l'Incident</button>
             </form>
         </div>
 
-        <div class="section full-width" style="border: 1px solid var(--yellow);">
-            <h2>Commission de Discipline : Cartons & Gages 🟥 🟨</h2>
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; flex-wrap: wrap;">
-                
-                <form id="cardForm" style="margin:0;">
-                    <h3>Distribuer une sanction</h3>
-                    <div class="form-group">
-                        <label>Collègue fautif :</label>
-                        <select class="colleagueSelect" id="cardTargetSelect" required>
-                            <option value="">-- Sélectionner --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Type de Carton :</label>
-                        <select id="cardType" required>
-                            <option value="JAUNE">🟨 Carton Jaune (Avertissement relou)</option>
-                            <option value="ROUGE">🟥 Carton Rouge (Gros manque de respect / Abus)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Motif de la sanction :</label>
-                        <input type="text" id="cardReason" placeholder="Ex: Soupir sonore en réunion, Vol de mug..." required>
-                    </div>
-                    <div class="form-group">
-                        <label>Gage suggéré :</label>
-                        <textarea id="cardPenalty" rows="2" placeholder="Ex: Doit vider le lave-vaisselle pendant 3 jours" required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn" style="background: #ffa502; color:black;">Sortir le Carton</button>
-                </form>
-
-                <div style="overflow-x: auto;">
-                    <h3>Registre des fautes (La VAR de l'Open Space)</h3>
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>Fautif</th>
-                                <th>Sanction</th>
-                                <th>Motif / Gage proposé / Arguments</th>
-                                <th>Votes Gage</th>
-                                <th>Statut / Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cardsTableBody">
-                            <tr><td colspan="5" style="text-align:center; color:#666;">Aucun carton distribué cette semaine. Ambiance suspecte...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="section full-width">
-            <h2>Suivi de la Côte (Historique Graphique Journalier)</h2>
+        <!-- GRAPH -->
+        <div class="section">
+            <h2>📊 Courbe de Motivation</h2>
             <div class="chart-container">
                 <canvas id="oddsChart"></canvas>
             </div>
         </div>
 
-        <div class="section full-width">
-            <h2>Bookmaker : Paris Long Terme 🎰</h2>
-            <p style="color: #aaa; font-size: 0.9em; margin-top: -10px;">Misez vos faux tickets resto sur le prochain départ.</p>
-            
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; flex-wrap: wrap;">
-                <form id="betForm" style="margin: 0;">
-                    <h3>Placer un prono</h3>
-                    <div class="form-group">
-                        <label>Votre nom (Parieur) :</label>
-                        <input type="text" id="bettorName" placeholder="Votre Prénom" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Qui va partir ?</label>
-                        <select class="colleagueSelect" id="betTargetSelect" required>
-                            <option value="">-- Sélectionner --</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Mois du départ :</label>
-                            <select id="betMonth" required>
-                                <option value="Janvier">Janvier</option><option value="Février">Février</option>
-                                <option value="Mars">Mars</option><option value="Avril">Avril</option>
-                                <option value="Mai">Mai</option><option value="Juin">Juin</option>
-                                <option value="Juillet">Juillet</option><option value="Août">Août</option>
-                                <option value="Septembre">Septembre</option><option value="Octobre">Octobre</option>
-                                <option value="Novembre">Novembre</option><option value="Décembre">Décembre</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Année :</label>
-                            <select id="betYear" required>
-                                <option value="2026">2026</option>
-                                <option value="2027">2027</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Mise (Tickets Resto 🎫) :</label>
-                        <input type="number" id="betAmount" min="1" max="10" value="1" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Valider le Pari</button>
-                </form>
-
-                <div style="overflow-x: auto;">
-                    <h3>Pronostics en cours</h3>
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>Parieur</th>
-                                <th>Cible</th>
-                                <th>Date Pronostiquée</th>
-                                <th>Mise</th>
-                            </tr>
-                        </thead>
-                        <tbody id="betsTableBody">
-                            <tr><td colspan="4" style="text-align:center; color:#666;">Aucun pari enregistré.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="section full-width" style="border: 1px dashed var(--accent-color);">
-            <h2 style="color: var(--accent-color);">🪦 Tombés au Combat (Hall of Fame / RIP)</h2>
-            <p style="color: #aaa; font-size: 0.9em; margin-top: -10px;">Hommage à ceux qui ont réussi à s'échapper de l'open space.</p>
-            
-            <div style="overflow-x: auto;">
-                <table class="custom-table rip-table">
-                    <thead>
-                        <tr>
-                            <th>Ancien Collègue</th>
-                            <th>Dernier Statut mémorable</th>
-                            <th>Date de Libération</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ripTableBody">
-                        <tr><td colspan="3" style="text-align:center; color:#666;">Personne n'est encore tombé au combat. L'esclavage continue !</td></tr>
-                    </tbody>
-                </table>
-            </div>
+        <!-- CIMETIÈRE -->
+        <div class="section" style="background: #111;">
+            <h2>🪦 Cimetière des RTT</h2>
+            <div class="fame-grid" id="fameGridBox"></div>
         </div>
 
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <!-- FIREBASE SERVICES -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-        // ⚠️ REMPLACE CE BLOC PAR TES PROPRES CLÉS DE LA CONSOLE FIREBASE !
-        const firebaseConfig = {
-        apiKey: "AIzaSyCn70t0lsSEoucFQDjvziA-KNO4u4jF_H4",
-        authDomain: "mercatodepression.firebaseapp.com",
-        projectId: "mercatodepression",
-        storageBucket: "mercatodepression.firebasestorage.app",
-        messagingSenderId: "409377389288",
-        appId: "1:409377389288:web:55e333c9be54796d5fe75d",
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        const colleaguesRef = collection(db, "colleagues");
-        const betsRef = collection(db, "bets");
-        const cardsRef = collection(db, "cards");
+    <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCn70t0lsSEoucFQDjvziA-KNO4u4jF_H4",
+      authDomain: "mercatodepression.firebaseapp.com",
+      projectId: "mercatodepression",
+      storageBucket: "mercatodepression.firebasestorage.app",
+      messagingSenderId: "409377389288",
+      appId: "1:409377389288:web:55e333c9be54796d5fe75d",
+      measurementId: "G-K1CF0LGN7X"
+    };
 
-        let colleagues = [];
-        let bets = [];
-        let cards = [];
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
         let oddsChartInstance = null;
+        let activeColleaguesCount = 0;
 
         function calculateOdds(score) {
             if (score <= 0) return 99.0;
-            let odds = (100 / score) + 1;
-            return parseFloat(odds.toFixed(2));
+            return parseFloat(((100 / score) + 1).toFixed(2));
         }
 
         function getTodayLabel() {
@@ -376,514 +369,267 @@
             return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
         }
 
-        function updateDailyHistory(currentHistory, currentOdds) {
-            let history = currentHistory ? [...currentHistory] : [];
-            const todayLabel = getTodayLabel();
-            const existingDayIdx = history.findIndex(h => h.date === todayLabel);
-            if (existingDayIdx !== -1) {
-                history[existingDayIdx].odds = currentOdds;
-            } else {
-                history.push({ date: todayLabel, odds: currentOdds });
+        // --- GÉNÉRATEUR DYNAMIQUE DE STATUTS ---
+        function generateDynamicStatus(direction, currentOdds) {
+            // Contextes basés sur la côte boursière de burn-out
+            if (direction === 'up') { // 👍 Pouce haut = Le moral monte, l'indice baisse, la côte grimpe (Stable)
+                if (currentOdds > 10) {
+                    const positiveHigh = [
+                        "A souri à un client. Suspect.",
+                        "A trouvé de la force dans un double expresso. Reste calme.",
+                        "Arrive à relativiser. Le management s'inquiète.",
+                        "Semble immunisé contre les e-mails passifs-agressifs aujourd'hui."
+                    ];
+                    return positiveHigh[Math.floor(Math.random() * positiveHigh.length)];
+                } else {
+                    return "Remonte la pente, mais revient de très loin. Surveillance requise.";
+                }
+            } 
+            
+            if (direction === 'down') { // 👎 Pouce bas = Le moral baisse, l'indice explose, la côte s'effondre (Alerte)
+                if (currentOdds <= 2.5) { // Côte très basse = Gros risque de départ
+                    const criticalStatus = [
+                        "⚠️ ALERTE ROUGE : Met discrètement son profil LinkedIn à jour.",
+                        "🔥 Côte au plus bas. Risque de fuite vers la concurrence sous 48h.",
+                        "A regardé fixement la fenêtre pendant 14 minutes. Code rouge.",
+                        "N'a même plus la force de râler. Phase terminale."
+                    ];
+                    return criticalStatus[Math.floor(Math.random() * criticalStatus.length)];
+                } else {
+                    const warningStatus = [
+                        "Vient de voir sa demande de RTT refusée. Ça gronde.",
+                        "Assiste à un call Teams qui aurait pu être un mail.",
+                        "Le seum s'accumule doucement mais sûrement.",
+                        "Soupir sonore identifié au pôle Sud de l'open space."
+                    ];
+                    return warningStatus[Math.floor(Math.random() * warningStatus.length)];
+                }
             }
-            if (history.length > 15) history.shift();
-            return history;
+
+            // Statuts par défaut via formulaire d'incident managérial
+            if (currentOdds <= 1.5) return "🚨 Crise managériale aiguë. Prêt à tout plaquer.";
+            if (currentOdds <= 3) return "⚡ En pleine négociation interne avec sa conscience pour rester.";
+            if (currentOdds <= 6) return "⏳ Motivation en chute libre. Éviter de lui parler de budget.";
+            return "R.A.S. Subit le quotidien corporatif de façon standard.";
         }
 
-        // 🔄 ÉCOUTES TEMPS RÉEL
-        onSnapshot(colleaguesRef, (snapshot) => {
-            colleagues = [];
-            snapshot.forEach((doc) => { colleagues.push({ id: doc.id, ...doc.data() }); });
-            document.getElementById('loading').style.display = 'none';
-            renderDashboard();
-            renderChart();
-            renderRipTable();
-        });
-
-        onSnapshot(betsRef, (snapshot) => {
-            bets = [];
-            snapshot.forEach((doc) => { bets.push({ id: doc.id, ...doc.data() }); });
-            renderBets();
-        });
-
-        onSnapshot(cardsRef, (snapshot) => {
-            cards = [];
-            snapshot.forEach((doc) => { cards.push({ id: doc.id, ...doc.data() }); });
-            renderCards();
-        });
-
-        // RENDU : Classement
-        function renderDashboard() {
-            const listElement = document.getElementById('marketList');
-            const selectElements = document.querySelectorAll('.colleagueSelect');
-            const activeColleagues = colleagues.filter(c => !c.isRip);
-
-            activeColleagues.sort((a, b) => b.score - a.score);
-            listElement.innerHTML = '';
+        db.collection("colleagues").onSnapshot((snapshot) => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('marketList').style.display = 'block';
+            let all = [];
+            snapshot.forEach(doc => { all.push({ id: doc.id, ...doc.data() }); });
+            let active = all.filter(c => !c.isRip).sort((a, b) => b.score - a.score);
+            activeColleaguesCount = active.length;
             
-            if (activeColleagues.length === 0) {
-                listElement.innerHTML = "<li style='text-align:center;color:#888;padding:20px;'>Tout le monde a fui !</li>";
-            }
+            renderDashboard(active);
+            renderChart(active);
+            renderHallOfFame(all.filter(c => c.isRip));
+        });
 
-            activeColleagues.forEach((c, index) => {
-                const isTop = index < 3 ? `top-${index + 1}` : '';
-                const todayKey = new Date().toDateString();
-                const hasVoted = localStorage.getItem(`voted_${c.id}_${todayKey}`) === 'true';
-
+        function renderDashboard(list) {
+            const mList = document.getElementById('marketList');
+            const selects = document.querySelectorAll('.colleagueSelect');
+            mList.innerHTML = list.length === 0 ? "<li style='text-align:center;color:#888;padding:10px;'>Personne en open space.</li>" : "";
+            
+            list.forEach((c, index) => {
                 const li = document.createElement('li');
-                li.className = `market-item ${isTop}`;
+                const currentOdds = calculateOdds(c.score);
+                li.className = `market-item ${index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : ''}`;
                 li.innerHTML = `
-                    <div class="colleague-info">
-                        <div><span class="rank-badge">#${index + 1}</span><span class="name">${c.name}</span></div>
-                        <span class="status">${c.status || 'Humeur stable...'}</span>
+                    <div class="item-header">
+                        <div>
+                            <span class="name">#${index + 1} ${c.name}</span>
+                            <div class="status">${c.status || 'En poste.'}</div>
+                            ${c.lastReason ? `<span class="mood-reason-tag">${c.lastReason}</span>` : ''}
+                        </div>
                     </div>
                     <div class="colleague-actions">
-                        <span class="odds">Côte: ${calculateOdds(c.score)}</span>
-                        <button class="vote-btn" data-id="${c.id}" data-vote="up" ${hasVoted ? 'disabled' : ''}>👍</button>
-                        <button class="vote-btn" data-id="${c.id}" data-vote="down" ${hasVoted ? 'disabled' : ''}>👎</button>
-                        <button class="rip-btn" data-id="${c.id}">🫡 RIP</button>
+                        <span class="odds">${currentOdds}</span>
+                        <button class="vote-btn" onclick="applyVote('${c.id}', ${c.score}, 'up')">👍</button>
+                        <button class="vote-btn" onclick="applyVote('${c.id}', ${c.score}, 'down')">👎</button>
+                        <button class="rip-btn" onclick="triggerRip('${c.id}')">💀</button>
                     </div>
                 `;
-                listElement.appendChild(li);
+                mList.appendChild(li);
             });
 
-            // Boutons votes humeurs
-            document.querySelectorAll('.vote-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    const type = btn.getAttribute('data-vote');
-                    const todayKey = new Date().toDateString();
-                    if (localStorage.getItem(`voted_${id}_${todayKey}`) === 'true') return;
-
-                    const colleague = colleagues.find(c => c.id === id);
-                    if (colleague) {
-                        const value = type === 'up' ? -5 : 5;
-                        const newScore = Math.max(5, colleague.score + value);
-                        const newStatus = type === 'up' ? "S'est pris un pouce levé, le moral remonte." : "S'est pris un pouce baissé, le moral en pâtit.";
-                        const currentOdds = calculateOdds(newScore);
-                        const updatedHistory = updateDailyHistory(colleague.history, currentOdds);
-
-                        localStorage.setItem(`voted_${id}_${todayKey}`, 'true');
-                        await updateDoc(doc(db, "colleagues", id), { score: newScore, status: newStatus, history: updatedHistory });
-                    }
-                });
-            });
-
-            // Bouton RIP
-            document.querySelectorAll('.rip-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    const colleague = colleagues.find(c => c.id === id);
-                    if (colleague) {
-                        if (confirm(`Confirmer que ${colleague.name} a OFFICIELLEMENT quitté le bureau ? 🫡`)) {
-                            const currentDay = new Date().toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
-                            await updateDoc(doc(db, "colleagues", id), { isRip: true, ripDate: currentDay });
-                        }
-                    }
-                });
-            });
-
-            // Update Selects dropdowns
-            selectElements.forEach(select => {
-                const savedValue = select.value;
-                select.innerHTML = '<option value="">-- Sélectionner --</option>';
-                activeColleagues.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.textContent = c.name;
-                    select.appendChild(opt);
-                });
-                select.value = savedValue;
+            selects.forEach(select => {
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">-- Choisir --</option>';
+                list.forEach(c => { select.innerHTML += `<option value="${c.id}[SPLIT]${c.name}">${c.name}</option>`; });
+                select.value = currentVal;
             });
         }
 
-        // RENDU : Commission de discipline (Cartons)
-        function renderCards() {
-            const body = document.getElementById('cardsTableBody');
-            body.innerHTML = '';
-
-            if (cards.length === 0) {
-                body.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#666;">Aucun carton distribué cette semaine. Ambiance suspecte...</td></tr>';
-                return;
-            }
-
-            cards.sort((a,b) => b.timestamp - a.timestamp);
-            const todayKey = new Date().toDateString();
+        // --- APPLIQUER UN VOTE (Modifie le score ET injecte un statut dynamique) ---
+        window.applyVote = function(id, currentScore, direction) {
+            let change = (direction === 'up') ? -5 : 5;
+            let newScore = Math.max(5, currentScore + change);
+            let nextOdds = calculateOdds(newScore);
             
-            // Calcul du quorum basé sur la moitié des membres actifs
-            const activeCount = colleagues.filter(c => !c.isRip).length;
-            const quorumRequired = Math.max(1, Math.ceil(activeCount / 2));
+            // Génération de l'humeur contextuelle amusante
+            let dynamicStatusText = generateDynamicStatus(direction, nextOdds);
 
-            cards.forEach(card => {
-                const badgeClass = card.type === 'ROUGE' ? 'card-red' : 'card-yellow';
-                const isResolved = card.status === 'RÉSOLU';
-                const isAnnulled = card.status === 'ANNULÉ_VAR';
-                
-                // Vérification des verrous de vote journaliers distincts
-                const hasVotedPenalty = localStorage.getItem(`voted_penalty_${card.id}_${todayKey}`) === 'true';
-                const hasVotedVar = localStorage.getItem(`voted_var_${card.id}_${todayKey}`) === 'true';
+            db.collection("colleagues").doc(id).update({
+                score: newScore,
+                status: dynamicStatusText
+            }).then(() => {
+                db.collection("colleagues").doc(id).get().then(doc => {
+                    let h = doc.data().history || [];
+                    h.push({ date: getTodayLabel(), odds: nextOdds });
+                    db.collection("colleagues").doc(id).update({ history: h });
+                });
+            });
+        };
 
-                let statusAndActions = "";
-                let voteArea = "";
-                let argumentDiv = "";
+        window.triggerRip = function(id) {
+            if(confirm("Confirmer le départ RTT / placard ?")) {
+                db.collection("colleagues").doc(id).update({ isRip: true, status: "A succombé aux RTT." });
+            }
+        };
 
-                // Zone d'affichage des arguments de contestation
-                if (card.argument) {
-                    argumentDiv = `<div style="font-size:0.85em; margin-top:6px; padding:6px; background:rgba(255,159,67,0.1); border-left:3px solid #ff9f43; border-radius:4px;">
-                        <b style="color:#ff9f43;">Défense :</b> "${card.argument}"
-                    </div>`;
-                }
+        // COMMISSION DE LA VAR
+        db.collection("cards").onSnapshot((snapshot) => {
+            const container = document.getElementById('cardsMobileContainer');
+            container.innerHTML = snapshot.empty ? '<div style="text-align:center;color:#666;font-size:0.9em;">Aucun litige en cours.</div>' : '';
+            const threshold = Math.ceil(activeColleaguesCount / 2);
 
-                if (isResolved) {
-                    statusAndActions = `<span style="color:var(--green); font-size:0.85em; font-weight:bold;">✅ Gage Réalisé !</span>`;
-                    voteArea = `<span style="color:#888; font-size:0.85em; font-style:italic;">Scrutin clos</span>`;
-                } else if (isAnnulled) {
-                    statusAndActions = `<span style="color:var(--accent-color); font-size:0.85em; font-weight:bold;">❌ Annulé par la VAR (Abusif)</span>`;
-                    voteArea = `<span style="color:#888; font-size:0.85em; font-style:italic;">Sanction levée</span>`;
-                } else if (card.status === "CONTESTÉ") {
-                    const totalVarVotes = (card.votesKeep || 0) + (card.votesCancel || 0);
-                    statusAndActions = `
-                        <div style="color: #ff9f43; font-weight:bold; font-size:0.85em; margin-bottom:5px;">⚠️ EN VAR (${totalVarVotes}/${quorumRequired} requis)</div>
-                        <button class="action-sm btn-success keep-card-btn" data-id="${card.id}" ${hasVotedVar ? 'disabled' : ''}>Conserver le carton (${card.votesKeep || 0})</button>
-                        <button class="action-sm btn-danger cancel-card-btn" data-id="${card.id}" ${hasVotedVar ? 'disabled' : ''}>Annuler / Rejeter (${card.votesCancel || 0})</button>
-                    `;
-                    voteArea = `<span style="color:#aaa; font-size:0.85em; font-style:italic;">Tribunal en cours</span>`;
-                } else {
-                    // Statut ACTIF ou VALIDÉ_VAR
-                    const isVarValidated = card.status === "VALIDÉ_VAR";
-                    statusAndActions = `
-                        <span style="color:#2ed573; font-size:0.85em; display:block; margin-bottom:5px;">✓ Actif ${isVarValidated ? '(Confirmé par VAR ⚖️)' : ''}</span>
-                        <div style="display:flex; gap:4px;">
-                            <button class="action-sm btn-success resolve-btn" data-id="${card.id}">Résolu 👍</button>
-                            <button class="action-sm btn-warning contest-btn" data-id="${card.id}" ${isVarValidated ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>Contester 🤬</button>
-                        </div>
-                    `;
-                    voteArea = `
-                        <div style="display: flex; gap: 4px; margin-bottom: 2px;">
-                            <button class="action-sm btn-success vote-penalty-up" data-id="${card.id}" ${hasVotedPenalty ? 'disabled' : ''}>👍 (${card.penaltyVotesUp || 0})</button>
-                            <button class="action-sm btn-danger vote-penalty-down" data-id="${card.id}" ${hasVotedPenalty ? 'disabled' : ''}>👎 (${card.penaltyVotesDown || 0})</button>
+            snapshot.forEach(doc => {
+                let card = doc.data();
+                let cardId = doc.id;
+                let actionsHtml = '';
+
+                if (card.status === 'En cours') {
+                    actionsHtml = `
+                        <div class="var-actions">
+                            <button class="action-sm btn-success" onclick="processVAR('${cardId}', 'valider')">Valider ✅</button>
+                            <button class="action-sm btn-danger" onclick="processVAR('${cardId}', 'contester')">Contester ❌</button>
                         </div>
                     `;
                 }
 
-                const tr = document.createElement('tr');
-                // Estomper visuellement les lignes résolues ou annulées
-                if (isResolved || isAnnulled) tr.style.opacity = '0.35';
-                
-                tr.innerHTML = `
-                    <td><b>${card.targetName}</b></td>
-                    <td><span class="card-badge ${badgeClass}">${card.type}</span></td>
-                    <td>
-                        <div style="font-size:0.9em; color:#bbb;"><b style="color:#fff;">Motif :</b> ${card.reason}</div>
-                        <div style="font-size:0.9em; margin-top:4px; color:#54a0ff;"><b style="color:#fff;">Gage :</b> ${card.penalty}</div>
-                        ${argumentDiv}
-                    </td>
-                    <td>${voteArea}</td>
-                    <td>${statusAndActions}</td>
+                container.innerHTML += `
+                    <div class="arbitrage-card">
+                        <div class="arbitrage-header">
+                            <strong>${card.targetName}</strong>
+                            <span class="card-badge ${card.type==='ROUGE'?'card-red':'card-yellow'}">${card.type}</span>
+                        </div>
+                        <div style="font-size:0.85em;">
+                            <strong>Motif :</strong> ${card.reason}<br>
+                            <strong>Gage :</strong> ${card.penalty}
+                        </div>
+                        <div style="font-size:0.75em; color:var(--text-muted); margin-top:8px; display:flex; justify-content:space-between;">
+                            <span>Pour: ${card.votesPour||0}/${threshold} | Contre: ${card.votesContre||0}/${threshold}</span>
+                            <span style="font-weight:bold;color:#ffa502">${card.status}</span>
+                        </div>
+                        ${actionsHtml}
+                    </div>
                 `;
-                body.appendChild(tr);
             });
+        });
 
-            // Événement : Gage résolu
-            document.querySelectorAll('.resolve-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    const card = cards.find(c => c.id === id);
-                    if (card) {
-                        if (confirm(`Confirmer que le gage de ${card.targetName} a bien été exécuté devant témoins ? 👁️`)) {
-                            await updateDoc(doc(db, "cards", id), { status: "RÉSOLU" });
-                        }
-                    }
+        window.processVAR = function(cardId, action) {
+            const ref = db.collection("cards").doc(cardId);
+            const threshold = Math.ceil(activeColleaguesCount / 2);
+            db.runTransaction((transaction) => {
+                return transaction.get(ref).then((doc) => {
+                    if (!doc.exists) return;
+                    let d = doc.data(), p = d.votesPour || 0, c = d.votesContre || 0, nextStatus = d.status;
+                    if (action === 'valider') { p++; if(p >= threshold) nextStatus = "Validé"; }
+                    else { c++; if(c >= threshold) nextStatus = "Annulé par la VAR"; }
+                    transaction.update(ref, { votesPour: p, votesContre: c, status: nextStatus });
                 });
             });
+        };
 
-            // Événement : Déclencher une contestation argumentée
-            document.querySelectorAll('.contest-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    const card = cards.find(c => c.id === id);
-                    if (!card) return;
-
-                    const defenseArg = prompt(`Plaidoirie de défense pour ${card.targetName} :\nPourquoi ce carton est injuste ? Indiquez vos arguments :`);
-                    
-                    if (defenseArg !== null && defenseArg.trim() !== "") {
-                        await updateDoc(doc(db, "cards", id), {
-                            status: "CONTESTÉ",
-                            argument: defenseArg.trim(),
-                            votesKeep: 0,
-                            votesCancel: 0
-                        });
-                        alert("Procédure de VAR lancée ! Le bureau doit voter.");
-                    } else if (defenseArg !== null) {
-                        alert("Vous devez fournir un argument valable pour contester un carton !");
-                    }
-                });
-            });
-
-            // Événement VAR : Conserver la sanction
-            document.querySelectorAll('.keep-card-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    if (localStorage.getItem(`voted_var_${id}_${todayKey}`) === 'true') return;
-
-                    const card = cards.find(c => c.id === id);
-                    if (card) {
-                        localStorage.setItem(`voted_var_${id}_${todayKey}`, 'true');
-                        const newVal = (card.votesKeep || 0) + 1;
-                        await updateDoc(doc(db, "cards", id), { votesKeep: newVal });
-                        checkVarResult(id, newVal, card.votesCancel || 0, quorumRequired);
-                    }
-                });
-            });
-
-            // Événement VAR : Annuler / Rejeter la sanction
-            document.querySelectorAll('.cancel-card-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    if (localStorage.getItem(`voted_var_${id}_${todayKey}`) === 'true') return;
-
-                    const card = cards.find(c => c.id === id);
-                    if (card) {
-                        localStorage.setItem(`voted_var_${id}_${todayKey}`, 'true');
-                        const newVal = (card.votesCancel || 0) + 1;
-                        await updateDoc(doc(db, "cards", id), { votesCancel: newVal });
-                        checkVarResult(id, card.votesKeep || 0, newVal, quorumRequired);
-                    }
-                });
-            });
-
-            // Événement : Vote Gage Positif 👍
-            document.querySelectorAll('.vote-penalty-up').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    if (localStorage.getItem(`voted_penalty_${id}_${todayKey}`) === 'true') return;
-                    const card = cards.find(c => c.id === id);
-                    if (card) {
-                        localStorage.setItem(`voted_penalty_${id}_${todayKey}`, 'true');
-                        await updateDoc(doc(db, "cards", id), { penaltyVotesUp: (card.penaltyVotesUp || 0) + 1 });
-                    }
-                });
-            });
-
-            // Événement : Vote Gage Négatif 👎
-            document.querySelectorAll('.vote-penalty-down').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.getAttribute('data-id');
-                    if (localStorage.getItem(`voted_penalty_${id}_${todayKey}`) === 'true') return;
-                    const card = cards.find(c => c.id === id);
-                    if (card) {
-                        localStorage.setItem(`voted_penalty_${id}_${todayKey}`, 'true');
-                        await updateDoc(doc(db, "cards", id), { penaltyVotesDown: (card.penaltyVotesDown || 0) + 1 });
-                    }
-                });
-            });
-        }
-
-        // Système de décompte VAR avec Quorum dynamique
-        async function checkVarResult(id, keep, cancel, quorumRequired) {
-            const totalVotes = keep + cancel;
+        // INCIDENT MANAGEMENT VIA FORMULAIRE
+        document.getElementById('moodForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const raw = document.getElementById('moodColleagueSelect').value; if(!raw) return;
+            const id = raw.split('[SPLIT]')[0];
+            const motive = document.getElementById('moodReasonSelect').value || "Incident non répertorié";
+            const intensity = parseInt(document.getElementById('moodSelect').value);
             
-            // On n'analyse le résultat que si le nombre total de votants atteint le quorum
-            if (totalVotes >= quorumRequired) {
-                if (cancel > keep) {
-                    alert("La contestation est validée ! Le carton passe au statut ANNULÉ.");
-                    await updateDoc(doc(db, "cards", id), { status: "ANNULÉ_VAR" });
-                } else if (keep >= cancel) {
-                    alert("Contestation rejetée par le bureau ! Le carton est validé, le coupable doit purger son gage.");
-                    await updateDoc(doc(db, "cards", id), { status: "VALIDÉ_VAR" });
+            let score = 45; 
+            if(intensity===1) score=15; 
+            if(intensity===3) score=55; 
+            if(intensity===4) score=75; 
+            if(intensity===5) score=95;
+            
+            let forcedOdds = calculateOdds(score);
+            let dynamicStatusText = generateDynamicStatus('form', forcedOdds);
+
+            db.collection("colleagues").doc(id).update({ 
+                score: score, 
+                lastReason: motive, 
+                status: dynamicStatusText 
+            });
+            document.getElementById('moodForm').reset();
+        });
+
+        document.getElementById('wailingForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const raw = document.getElementById('wailerSelect').value; if(!raw) return;
+            const id = raw.split('[SPLIT]')[0], name = raw.split('[SPLIT]')[1], txt = document.getElementById('wailText').value.trim();
+            db.collection("complaints").add({ text: txt, authorName: name, timestamp: Date.now() });
+            
+            db.collection("colleagues").doc(id).get().then(doc => {
+                if(doc.exists) {
+                    let s = doc.data().score || 45;
+                    let newScore = Math.max(5, s - 5);
+                    db.collection("colleagues").doc(id).update({
+                        score: newScore,
+                        status: "Se sent un peu plus léger après avoir déversé son fiel."
+                    });
                 }
-            }
-        }
+            });
+            document.getElementById('wailText').value = "";
+        });
 
-        // RENDU : Liste des paris
-        function renderBets() {
-            const tableBody = document.getElementById('betsTableBody');
-            tableBody.innerHTML = '';
-            if (bets.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#666;">Aucun pari enregistré.</td></tr>';
-                return;
-            }
-            bets.sort((a,b) => b.timestamp - a.timestamp);
-            bets.forEach(b => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td><b>${b.bettor}</b></td><td>${b.targetName}</td><td>📅 ${b.dateTarget}</td><td><span class="token-badge">${b.amount} 🎫</span></td>`;
-                tableBody.appendChild(tr);
+        document.getElementById('cardForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const raw = document.getElementById('cardTargetSelect').value; if(!raw) return;
+            db.collection("cards").add({
+                targetName: raw.split('[SPLIT]')[1],
+                type: document.getElementById('cardType').value,
+                reason: document.getElementById('cardReason').value.trim(),
+                penalty: document.getElementById('cardPenalty').value.trim(),
+                votesPour: 0, votesContre: 0, status: "En cours"
+            });
+            document.getElementById('cardForm').reset();
+        });
+
+        db.collection("complaints").orderBy("timestamp", "desc").limit(10).onSnapshot((snapshot) => {
+            const box = document.getElementById('wailingWallBox'); box.innerHTML = "";
+            snapshot.forEach(doc => {
+                let p = doc.data();
+                box.innerHTML += `<div class="wailing-post">"${p.text}"<div class="wailing-meta">✍️ ${p.authorName}</div></div>`;
+            });
+        });
+
+        function renderHallOfFame(deadList) {
+            const box = document.getElementById('fameGridBox'); box.innerHTML = "";
+            deadList.forEach(c => {
+                box.innerHTML += `<div class="tombstone"><div class="rip-name">${c.name}</div><div class="rip-reason">${c.lastReason||'Libéré du open space.'}</div></div>`;
             });
         }
 
-        // RENDU : Tableau Tombés au combat
-        function renderRipTable() {
-            const ripBody = document.getElementById('ripTableBody');
-            ripBody.innerHTML = '';
-            const ripColleagues = colleagues.filter(c => c.isRip);
-            if (ripColleagues.length === 0) {
-                ripBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#666;">Personne n\'est encore tombé au combat. L\'esclavage continue !</td></tr>';
-                return;
-            }
-            ripColleagues.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td><b>🪦 ${c.name}</b></td><td><span style="font-style: italic; color:#aaa;">"${c.status || 'Est parti sans laisser d\'adresse'}"</span></td><td><span class="rip-badge">🕊️ Libéré le ${c.ripDate || 'Récemment'}</span></td>`;
-                ripBody.appendChild(tr);
-            });
-        }
-
-        // RENDU DU GRAPHIQUE JOURNALIER
-        function renderChart() {
+        function renderChart(list) {
             const ctx = document.getElementById('oddsChart').getContext('2d');
-            const activeColleagues = colleagues.filter(c => !c.isRip);
-            
-            let allDates = new Set();
-            activeColleagues.forEach(c => {
-                (c.history || []).forEach(h => { if(h.date) allDates.add(h.date); });
-            });
-            
-            let labelsX = Array.from(allDates).sort();
-            if (labelsX.length === 0) labelsX = [getTodayLabel()];
-
-            const datasets = activeColleagues.map((c, idx) => {
-                const history = c.history || [];
-                let lastKnownOdds = calculateOdds(c.score);
-                
-                const dataPoints = labelsX.map(dateLabel => {
-                    const pointFound = history.find(h => h.date === dateLabel);
-                    if (pointFound) {
-                        lastKnownOdds = pointFound.odds;
-                        return pointFound.odds;
-                    }
-                    return lastKnownOdds;
-                });
-
-                const hues = [0, 120, 220, 280, 40, 180];
-                const color = `hsla(${hues[idx % hues.length]}, 70%, 60%, 1)`;
-
-                return {
-                    label: c.name,
-                    data: dataPoints,
-                    borderColor: color,
-                    backgroundColor: color.replace('1)', '0.1)'),
-                    borderWidth: 3,
-                    tension: 0.1,
-                    fill: false
-                };
-            });
-
-            if (oddsChartInstance) { oddsChartInstance.destroy(); }
-
+            const label = getTodayLabel();
+            const datasets = list.map((c, idx) => ({
+                label: c.name,
+                data: (c.history || [{date: label, odds: calculateOdds(c.score)}]).map(h => h.odds),
+                borderColor: `hsla(${(idx * 85) % 360}, 80%, 60%, 1)`,
+                borderWidth: 2, tension: 0.2, backgroundColor: 'transparent'
+            }));
+            if (oddsChartInstance) oddsChartInstance.destroy();
             oddsChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: { labels: labelsX, datasets: datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#fff' } } },
-                    scales: {
-                        y: {
-                            title: { display: true, text: 'Côte du départ (Basse = Favori)', color: '#fff' },
-                            grid: { color: '#333' }, ticks: { color: '#aaa' }
-                        },
-                        x: { grid: { color: '#333' }, ticks: { color: '#aaa' } }
-                    }
-                }
+                data: { labels: [label], datasets: datasets },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
-
-        // ACTION : Distribuer un carton
-        document.getElementById('cardForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const targetId = document.getElementById('cardTargetSelect').value;
-            const type = document.getElementById('cardType').value;
-            const reason = document.getElementById('cardReason').value.trim();
-            const penalty = document.getElementById('cardPenalty').value.trim();
-
-            const targetColleague = colleagues.find(c => c.id === targetId);
-
-            if (targetColleague) {
-                await addDoc(cardsRef, {
-                    targetId: targetId,
-                    targetName: targetColleague.name,
-                    type: type,
-                    reason: reason,
-                    penalty: penalty,
-                    penaltyVotesUp: 0,
-                    penaltyVotesDown: 0,
-                    status: "ACTIF",
-                    argument: "",
-                    timestamp: Date.now()
-                });
-
-                document.getElementById('cardForm').reset();
-            }
-        });
-
-        // ACTION : Formulaire d'Humeur
-        document.getElementById('moodForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.querySelector('#moodForm .colleagueSelect').value;
-            const moodValue = parseInt(document.getElementById('moodSelect').value);
-            
-            const colleague = colleagues.find(c => c.id === id);
-            if (colleague) {
-                let scoreImpact = 0;
-                let newStatus = "";
-                
-                switch(moodValue) {
-                    case 1: scoreImpact = -15; newStatus = "Sourire radieux, le moral est au top !"; break;
-                    case 2: scoreImpact = 0; newStatus = "Routine habituelle, moral stable."; break;
-                    case 3: scoreImpact = 10; newStatus = "Un peu fatigué, quelques soupirs discrets."; break;
-                    case 4: scoreImpact = 25; newStatus = "La tension monte, le moral flanche sérieusement."; break;
-                    case 5: scoreImpact = 55; newStatus = "ALERTE ROUGE : Mis à jour son statut LinkedIn en direct."; break;
-                }
-
-                const newScore = Math.max(5, colleague.score + scoreImpact);
-                const currentOdds = calculateOdds(newScore);
-                const updatedHistory = updateDailyHistory(colleague.history, currentOdds);
-
-                await updateDoc(doc(db, "colleagues", id), { score: newScore, status: newStatus, history: updatedHistory });
-                document.getElementById('moodForm').reset();
-            }
-        });
-
-        // ACTION : Placer un Pari
-        document.getElementById('betForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const bettor = document.getElementById('bettorName').value.trim();
-            const targetId = document.getElementById('betTargetSelect').value;
-            const month = document.getElementById('betMonth').value;
-            const year = document.getElementById('betYear').value;
-            const amount = document.getElementById('betAmount').value;
-
-            const targetColleague = colleagues.find(c => c.id === targetId);
-
-            if (targetColleague && bettor) {
-                await addDoc(betsRef, {
-                    bettor: bettor,
-                    targetId: targetId,
-                    targetName: targetColleague.name,
-                    dateTarget: `${month} ${year}`,
-                    amount: parseInt(amount),
-                    timestamp: Date.now()
-                });
-                document.getElementById('betForm').reset();
-                alert("Pari enregistré avec succès !");
-            }
-        });
-
-        // ACTION : Ajouter un nouveau collègue
-        document.getElementById('addColleagueForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('newColleagueName').value.trim();
-            if (name) {
-                const initialScore = 40;
-                const initialOdds = calculateOdds(initialScore);
-                await addDoc(colleaguesRef, {
-                    name: name,
-                    score: initialScore,
-                    status: "Nouveau sur le marché de l'open space.",
-                    isRip: false,
-                    history: [{ date: getTodayLabel(), odds: initialOdds }]
-                });
-                document.getElementById('addColleagueForm').reset();
-            }
-        });
     </script>
 </body>
 </html>
