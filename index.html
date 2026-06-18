@@ -52,7 +52,7 @@
         }
 
         header::before {
-            content: "DUNDER MIFFLIN PAPER COMPANY - SCRANTON INTERNAL PORTAL";
+            content: "DCEA A DUNDER MIFFLIN PAPER COMPANY - PARIS BRANCH PORTAL";
             display: block;
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.75em;
@@ -654,14 +654,14 @@
         
         <!-- SECTION 1 : CLASSEMENT GENERAL -->
         <div class="section">
-            <h2>Le Classement Général</h2>
+            <h2>Argus de la motivation</h2>
             <div id="loading">Récupération des données du seum...</div>
             <ul id="marketList" class="market-list"></ul>
         </div>
 
         <!-- SECTION 2 : FORMULAIRES DE MISE A NIVEAU -->
         <div class="section">
-            <h2>Alimenter la Base & Humeurs</h2>
+            <h2>Alimenter la Base du seum</h2>
             
             <!-- Formulaire d'Humeur -->
             <form id="moodForm">
@@ -709,7 +709,7 @@
 
             <!-- Ajouter un nouveau -->
             <form id="addColleagueForm">
-                <h3>Inscrire un nouveau collègue</h3>
+                <h3>Coin des RH - New player</h3>
                 <div class="form-group">
                     <input type="text" id="newColleagueName" placeholder="Prénom Nom" required>
                 </div>
@@ -724,7 +724,7 @@
             
             <div class="section-with-gif">
                 <div class="section-gif-container">
-                    <img src="https://media.giphy.com/media/hyyV7pnbE0FqL1LkoO/giphy.gif" alt="Michael No God Please No">
+                    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOGtnY21wdHdhZjd6Z2l1OGp6NWRsanoyczE5Mm04eXltajhpYWEyNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/esR1eKgmOnxWKR627f/giphy.gif" alt="Michael No God Please No">
                 </div>
                 <div class="section-content-fluid">
                     <div class="wailing-wall" id="wailingWallBox">
@@ -802,7 +802,7 @@
 
         <!-- SECTION 3 : SUIVI DE CÔTE (GRAPHIQUE INTERACTIF) -->
         <div class="section full-width">
-            <h2>Suivi de la Côte (Historique Graphique Journalier)</h2>
+            <h2>Seum-o-mètre</h2>
             <div class="chart-container">
                 <canvas id="oddsChart"></canvas>
             </div>
@@ -810,7 +810,7 @@
 
         <!-- SECTION 4 : LES PARIS LONG TERME -->
         <div class="section full-width">
-            <h2>Bookmaker : Paris Long Terme 🎰</h2>
+            <h2>Malone's corner: Qui sera la prochain 🎰</h2>
             <p style="color: var(--grey); font-size: 0.9em; margin-top: -10px;">Misez vos faux tickets resto sur le prochain départ.</p>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
@@ -895,7 +895,7 @@
                     </table>
                 </div>
                 <div class="section-gif-container" style="width: 180px;">
-                    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWZ6bXlyamV3ZHg5bXBvZnRzYXAwMTl1eW94NDRkcGptMXdtcW51ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/G3w5bFfY85rag/giphy.gif" alt="Michael Scott Goodbye">
+                    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWM2aWE5aHZ2djRtM2s0cWZoM3V6Z3A2c2I2aWlwdjBzc2dsdDk0MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vyTnNTrs3wqQ0UIvwE/giphy.gif" alt="Michael Scott Goodbye">
                 </div>
             </div>
         </div>
@@ -905,14 +905,16 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const michaelQuotes = [
-                "\"Je ne suis pas superstitieux, mais je suis un peu stitieux.\"",
-                "\"Est-ce que je préfère être aimé ou craint ? Facile. Les deux. Je veux que les gens aient peur de la ferveur avec laquelle ils m'aiment.\"",
-                "\"Parfois, je commence une phrase et je ne sais même pas où elle va. J'espère juste la trouver en chemin.\"",
-                "\"C'est ce qu'elle a dit ! (That's what she said)\"",
-                "\"Je cours comme le vent, mais en plus rapide.\"",
-                "\"Wikipédia est la meilleure chose qui soit. N'importe qui dans le monde peut écrire n'importe quoi sur n'importe quel sujet. On sait donc qu'on obtient les meilleures informations possibles.\"",
+                "\"You miss 100% of the shots you don’t take. - Wayne Gretzky” - Michael Scott\"",
+                "\"Wikipedia is the best thing ever. Anyone in the world can write anything they want about any subject so you know you are getting the best possible information.\"",
+                "\"I’m an early bird and I’m a night owl so I’m wise and I have worms.\"",
+                "\"I… Declare…. Bankruptcy!\"",
+                "\"You don't know me, you've just seen my penis.\"",
+                "\"The worst thing about prison was the Dementors. They were flying all over the place and they were scary and they'd come down and they'd suck the soul out of your body and it hurt!\"",
                 "\"I love inside jokes. I'd love to be a part of one someday.\"",
-                "\"Tu rates 100% des tirs que tu ne prends pas. - Wayne Gretzky - Michael Scott\""
+                "\"I'm not superstitious, but I am a little stitious.\"",
+                "\"I am Beyoncé, always.\"",
+                "\"If I had a gun with two bullets and I was in a room with Hitler, Bin Laden, and Toby, I would shoot Toby twice.\""
             ];
             const randomQuote = michaelQuotes[Math.floor(Math.random() * michaelQuotes.length)];
             const quoteElement = document.getElementById("michaelQuote");
